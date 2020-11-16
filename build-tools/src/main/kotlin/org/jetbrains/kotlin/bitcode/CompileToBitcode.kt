@@ -109,6 +109,14 @@ open class CompileToBitcode @Inject constructor(
     @OutputFile
     val outFile = File(targetDir, "${folderName}.bc")
 
+    @get:OutputFiles
+    protected val compiledFiles: Iterable<File>
+        get() {
+            return inputFiles.map {
+                objDir.resolve("${it.nameWithoutExtension}.bc")
+            }
+        }
+
     @TaskAction
     fun compile() {
         objDir.mkdirs()
@@ -125,9 +133,7 @@ open class CompileToBitcode @Inject constructor(
                 val llvmDir = project.findProperty("llvmDir")
                 it.executable = "$llvmDir/bin/llvm-link"
                 it.args = listOf("-o", outFile.absolutePath) + linkerArgs +
-                        project.fileTree(objDir) {
-                            it.include("**/*.bc")
-                        }.files.map { it.absolutePath }
+                        compiledFiles.map { it.absolutePath }
             }
         }
     }
