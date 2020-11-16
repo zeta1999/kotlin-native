@@ -45,6 +45,14 @@ bitcode {
         linkerArgs.add(project.file("../common/build/bitcode/main/$target/hash.bc").path)
     }
 
+    create("main_tests", file("src/main"), outputGroup = "test") {
+        includeRuntime()
+        dependsOn("downloadGoogleTest")
+        headersDirs += googletest.headersDirs
+        excludeFiles = emptyList()
+        includeFiles = listOf("**/*Test.cpp", "**/*Test.mm")
+    }
+
     create("mimalloc") {
         language = CompileToBitcode.Language.C
         includeFiles = listOf("**/*.c")
@@ -113,14 +121,13 @@ targetList.forEach { targetName ->
             "${targetName}StdAllocRuntimeTests",
             listOf(
                 "${targetName}Runtime",
+                "${targetName}MainTests",
                 "${targetName}LegacyMemoryManager",
                 "${targetName}Strict",
                 "${targetName}Release",
                 "${targetName}StdAlloc"
             )
-    ) {
-        includeRuntime()
-    }
+    )
 
     createTestTask(
             project,
@@ -128,15 +135,14 @@ targetList.forEach { targetName ->
             "${targetName}MimallocRuntimeTests",
             listOf(
                 "${targetName}Runtime",
+                "${targetName}MainTests",
                 "${targetName}LegacyMemoryManager",
                 "${targetName}Strict",
                 "${targetName}Release",
                 "${targetName}Mimalloc",
                 "${targetName}OptAlloc"
             )
-    ) {
-        includeRuntime()
-    }
+    )
 
     createTestTask(
             project,
@@ -144,14 +150,13 @@ targetList.forEach { targetName ->
             "${targetName}ExperimentalMMRuntimeTests",
             listOf(
                 "${targetName}Runtime",
+                "${targetName}RuntimeTests",
                 "${targetName}ExperimentalMemoryManager",
                 "${targetName}Release",
                 "${targetName}Mimalloc",
                 "${targetName}OptAlloc"
             )
-    ) {
-        includeRuntime()
-    }
+    )
 
     tasks.register("${targetName}RuntimeTests") {
         dependsOn("${targetName}StdAllocRuntimeTests")
