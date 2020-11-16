@@ -44,9 +44,6 @@ open class CompileToBitcode @Inject constructor(
     var headersDirs: FileCollection = project.files(srcRoot.resolve("headers"))
 
     @Input
-    var skipLinkagePhase = false
-
-    @Input
     var language = Language.CPP
 
     private val targetDir by lazy { project.buildDir.resolve("bitcode/$outputGroup/$target") }
@@ -128,13 +125,11 @@ open class CompileToBitcode @Inject constructor(
             it.args = compilerFlags + inputFiles.map { it.absolutePath }
         }
 
-        if (!skipLinkagePhase) {
-            project.exec {
-                val llvmDir = project.findProperty("llvmDir")
-                it.executable = "$llvmDir/bin/llvm-link"
-                it.args = listOf("-o", outFile.absolutePath) + linkerArgs +
-                        compiledFiles.map { it.absolutePath }
-            }
+        project.exec {
+            val llvmDir = project.findProperty("llvmDir")
+            it.executable = "$llvmDir/bin/llvm-link"
+            it.args = listOf("-o", outFile.absolutePath) + linkerArgs +
+                    compiledFiles.map { it.absolutePath }
         }
     }
 }
