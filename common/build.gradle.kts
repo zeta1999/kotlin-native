@@ -8,8 +8,12 @@ plugins {
 }
 
 bitcode {
-    create("hash")
-    create("files")
+    create("hash") {
+        headersDirs = files("$srcRoot/headers")
+    }
+    create("files") {
+        headersDirs = files("$srcRoot/headers")
+    }
 }
 
 val hostName: String by project
